@@ -73,3 +73,9 @@ test('Valid Login Flow', async ({ page }) => {
 });
 
 });
+
+// Verify that a registered user can successfully log in using valid credentials and access the homepage.
+// Verify that a user can search for a product using a keyword and relevant results are displayed.
+// Verify that a user can open a product and view correct details such as name, price, images, and ratings.
+// Verify that a user can add a product to the cart from the product listing or product detail page.
+// Verify that the cart displays correct product information including name, quantity, and total price.
