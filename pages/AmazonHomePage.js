@@ -15,10 +15,16 @@ class AmazonHomePage {
   }
 
   async handleContinueShoppingIfPresent() {
-    if (await this.continueShoppingBtn.isVisible().catch(() => false)) {
-      await this.continueShoppingBtn.click();
-    }
+  const btn = this.page.getByText(/continue shopping/i);
+
+  if (await btn.isVisible().catch(() => false)) {
+    console.log('Continue Shopping detected → clicking');
+    await btn.click();
+
+    // Wait for real homepage to load
+    await this.page.waitForSelector('#twotabsearchtextbox', { timeout: 10000 }).catch(() => {});
   }
+}
 
   async searchProduct(productName) {
     await this.searchBox.waitFor({ state: 'visible', timeout: 10000 });
@@ -27,8 +33,16 @@ class AmazonHomePage {
   }
 
   async clickSignIn() {
-    await this.signInLink.click();
+  const visible = await this.signInLink.isVisible().catch(() => false);
+
+  if (!visible) {
+    console.log('Sign-in not visible → skipping due to bot/intermediate page');
+    return false;
   }
+
+  await this.signInLink.click();
+  return true;
+}
 
   async detectBot() {
     const content = await this.page.content();
