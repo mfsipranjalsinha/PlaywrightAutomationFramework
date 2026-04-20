@@ -32,5 +32,5 @@ jobs:
       with:
         name: test-artifacts
         path: |
-        playwright-report/
-        test-results/
+          playwright-report/
+          test-results/
