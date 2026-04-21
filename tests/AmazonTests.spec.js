@@ -4,7 +4,7 @@ import AmazonLoginPage from '../pages/AmazonLoginPage';
 import SearchResultsPage from '../pages/SearchResultsPage';
 import 'dotenv/config';
 
-test.only('Verify All Menu Sections and Items', async ({ page }) => {
+test('Verify All Menu Sections and Items', async ({ page }) => {
 
   const home = new AmazonHomePage(page);
 
