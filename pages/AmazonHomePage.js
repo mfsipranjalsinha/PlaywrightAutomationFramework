@@ -1,60 +1,85 @@
-class AmazonHomePage {
+import { expect } from '@playwright/test';
 
+const selectors = {
+  button: {
+    signIn: '#nav-link-accountList',
+    continueShopping: 'text=Continue shopping',
+    allMenu: 'span.hm-icon-label',
+    closeAllMenu: '#hmenu-close-icon',
+    searchBox: '#twotabsearchtextbox'
+  },
+  menu: {
+    canvas: '#hmenu-canvas',
+    container: '#hmenu-canvas #hmenu-content'
+  }
+};
+
+class AmazonHomePage {
   constructor(page) {
     this.page = page;
 
-    this.searchBox = page.locator('#twotabsearchtextbox');
-    this.continueShoppingBtn = page.getByText('Continue to Shopping');
-    this.signInLink = page.getByRole('link', { name: 'Hello, sign in Account & Lists' });
+    this.signInBtn = page.locator(selectors.button.signIn);
+    this.allMenuBtn = page.locator(selectors.button.allMenu);
+    this.closeMenuBtn = page.locator(selectors.button.closeAllMenu);
+    this.searchBox = page.locator(selectors.button.searchBox);
+
+    this.menuCanvas = page.locator(selectors.menu.canvas);
+    this.menuContainer = page.locator(selectors.menu.container);
   }
 
-  async navigate() {
-    await this.page.goto('https://www.amazon.in/');
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.page.waitForTimeout(3000); // stabilize rendering
-  }
-
-  async handleContinueShoppingIfPresent() {
-  const btn = this.page.getByText(/continue shopping/i);
-
-  if (await btn.isVisible().catch(() => false)) {
-    console.log('Continue Shopping detected → clicking');
-    await btn.click();
-
-    // Wait for real homepage to load
-    await this.page.waitForSelector('#twotabsearchtextbox', { timeout: 10000 }).catch(() => {});
-  }
+  async gotoURL(url) {
+  await this.page.goto(url, { waitUntil: 'domcontentloaded' });
 }
-
-  async searchProduct(productName) {
-    await this.searchBox.waitFor({ state: 'visible', timeout: 10000 });
-    await this.searchBox.fill(productName);
-    await this.searchBox.press('Enter');
-  }
 
   async clickSignIn() {
-  const visible = await this.signInLink.isVisible().catch(() => false);
-
-  if (!visible) {
-    console.log('Sign-in not visible → skipping due to bot/intermediate page');
-    return false;
+    await this.signInBtn.click();
   }
 
-  await this.signInLink.click();
-  return true;
-}
+  async clickAllMenu() {
+    await expect(this.allMenuBtn).toBeVisible();
 
-  async detectBot() {
-    const content = await this.page.content();
+    for (let i = 0; i < 2; i++) {
+      await this.allMenuBtn.click();
 
-    return {
-      isCaptcha: content.includes('Enter the characters you see below'),
-      isRobot: content.includes('not a robot'),
-      isBlocked: content.includes('Sorry, we just need to make sure'),
-      isContinueShopping: content.includes('Continue shopping')
-    };
+      try {
+        await expect(this.menuCanvas.first()).toBeVisible({ timeout: 3000 });
+        return;
+      } catch {
+        await this.page.waitForTimeout(500);
+      }
+    }
+
+    throw new Error('Hamburger menu did not open');
   }
 
+  async searchProduct(product) {
+    await this.searchBox.fill(product);
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForLoadState('domcontentloaded');
+  }
+
+  async verifyMenuSection(sectionName) {
+    const section = this.menuContainer.locator(`section[aria-labelledby="${sectionName}"]`);
+    await expect(section.first()).toBeVisible({ timeout: 5000 });
+  }
+
+  async verifyMenuItem(sectionName, itemName) {
+    const section = this.menuContainer.locator(`section[aria-labelledby="${sectionName}"]`);
+    await expect(section.getByText(itemName).first()).toBeVisible({ timeout: 5000 });
+  }
+
+  async closeAllMenu() {
+    await expect(this.closeMenuBtn).toBeVisible();
+
+    await Promise.all([
+      this.menuCanvas.waitFor({ state: 'hidden' }),
+      this.closeMenuBtn.click()
+    ]);
+  }
+
+  getAllMenuContainer() {
+    return this.menuCanvas;
+  }
 }
 
 export default AmazonHomePage;
