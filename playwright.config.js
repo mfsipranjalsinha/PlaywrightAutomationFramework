@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
+import 'dotenv/config';
 
 /**
  * Read environment variables from file.
@@ -32,6 +33,7 @@ export default defineConfig({
   navigationTimeout: 30000,
   trace: 'on-first-retry',
   screenshot: 'only-on-failure',
+  video: 'retain-on-failure'
 },
 
   /* Configure projects for major browsers */
