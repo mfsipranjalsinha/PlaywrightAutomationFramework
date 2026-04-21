@@ -31,6 +31,14 @@ class AmazonHomePage {
   await this.page.goto(url, { waitUntil: 'domcontentloaded' });
 }
 
+  async handleContinueShopping() {
+  const btn = this.page.getByRole('button', { name: 'Continue shopping' });
+
+  if (await btn.isVisible().catch(() => false)) {
+    await btn.click();
+  }
+}
+
   async clickSignIn() {
     await this.signInBtn.click();
   }
@@ -68,15 +76,17 @@ class AmazonHomePage {
     await expect(section.getByText(itemName).first()).toBeVisible({ timeout: 5000 });
   }
 
-  async closeAllMenu() {
-    await expect(this.closeMenuBtn).toBeVisible();
+ async closeAllMenu() {
+  const closeBtn = this.page.getByRole('button', { name: 'Close menu' }).first();
+  const menu = this.page.locator('#hmenu-canvas:visible');
 
-    await Promise.all([
-      this.menuCanvas.waitFor({ state: 'hidden' }),
-      this.closeMenuBtn.click()
-    ]);
-  }
+  await expect(closeBtn).toBeVisible();
 
+  await Promise.all([
+    menu.waitFor({ state: 'hidden' }),
+    closeBtn.click()
+  ]);
+}
   getAllMenuContainer() {
     return this.menuCanvas;
   }

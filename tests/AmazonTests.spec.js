@@ -4,11 +4,12 @@ import AmazonLoginPage from '../pages/AmazonLoginPage';
 import SearchResultsPage from '../pages/SearchResultsPage';
 import 'dotenv/config';
 
-test('Verify All Menu Sections and Items', async ({ page }) => {
+test.only('Verify All Menu Sections and Items', async ({ page }) => {
 
   const home = new AmazonHomePage(page);
 
   await home.gotoURL('https://www.amazon.in/');
+  await home.handleContinueShopping();
   await home.clickAllMenu();
 
   await expect(home.getAllMenuContainer()).toBeVisible();
@@ -43,6 +44,7 @@ test('Valid Login Flow', async ({ page }) => {
   const login = new AmazonLoginPage(page);
 
   await home.gotoURL('https://www.amazon.in/');
+  await home.handleContinueShopping();
   await home.clickSignIn();
 
   await login.verifyLoginPage();
@@ -66,6 +68,7 @@ test('Search and apply HP brand filter', async ({ page }) => {
   const results = new SearchResultsPage(page);
 
   await home.gotoURL('https://www.amazon.in/');
+  await home.handleContinueShopping();
   await home.searchProduct('laptop');
 
   await results.verifyResultsVisible();
