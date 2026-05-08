@@ -5,7 +5,7 @@ import AmazonLoginPage from '../pages/AmazonLoginPage.js';
 import AccountPage from '../pages/AccountPage.js';
 import AddressPage from '../pages/AddressPage.js';
 
-import addressData from '../test-Data/addressData.json' assert { type: 'json' };
+import addressData from '../test-data/addressData.json' assert { type: 'json' };
 
 let home;
 let login;
