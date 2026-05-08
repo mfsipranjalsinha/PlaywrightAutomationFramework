@@ -48,10 +48,6 @@ export default defineConfig({
     screenshot: 'only-on-failure',
 
     video: 'retain-on-failure',
-
-    launchOptions: {
-      args: ['--disable-web-security']
-    }
   },
 
   expect: {
