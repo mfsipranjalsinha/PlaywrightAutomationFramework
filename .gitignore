@@ -7,3 +7,23 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .env
+
+#Allure reports
+allure-results/
+allure-report/
+
+# Screenshots/videos/traces
+screenshots/
+videos/
+traces/
+
+# Snapshots
+*-snapshots/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

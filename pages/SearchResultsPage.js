@@ -1,60 +1,147 @@
 import { expect } from '@playwright/test';
 
+const MAX_RESULTS = 5;
+
 const selectors = {
-  results: '[data-component-type="s-search-result"]',
-  productTitles: 'h2 span'
+  product: {
+    results: '[data-component-type="s-search-result"]',
+    title: 'h2 span',
+    link: 'a:has(h2)',
+    price: '.a-price-whole',
+    rating: '.a-icon-alt'
+  },
+
+  filter: {
+    brand: (brand) =>
+      `[aria-label="Apply the filter ${brand} to narrow results"]`,
+
+    appliedBrand: (brand) =>
+      `[aria-label="Remove the filter ${brand} to expand results"] input`
+  }
 };
 
 class SearchResultsPage {
   constructor(page) {
     this.page = page;
-
-    this.results = page.locator(selectors.results);
-    this.productTitles = page.locator(selectors.productTitles);
   }
 
-  async verifyResultsVisible() {
-    await expect(this.results.first()).toBeVisible();
+  // just check results loaded
+  async checkResultsLoaded() {
+    await expect(
+      this.page.locator(selectors.product.results).first()
+    ).toBeVisible();
   }
 
-  async verifyResultsContainKeyword(keyword) {
-    const count = await this.productTitles.count();
+  // make sure search returned relevant non-sponsored products
+  async checkKeyword(keyword) {
 
-    for (let i = 0; i < count && i < 5; i++) {
-      const text = await this.productTitles.nth(i).innerText();
+    const products = this.page
+      .locator(selectors.product.results)
+      .filter({ hasNotText: 'Sponsored' });
+
+    const count = await products.count();
+
+    let found = 0;
+
+    for (let i = 0; i < count; i++) {
+      const text = await products
+        .nth(i)
+        .locator(selectors.product.title)
+        .innerText();
 
       if (text.toLowerCase().includes(keyword.toLowerCase())) {
-        return;
+        found++;
       }
     }
 
-    throw new Error(`No results found with keyword: ${keyword}`);
+    console.log(`Checked: ${count}, Matches: ${found}`);
+    expect(found).toBeGreaterThan(0);
   }
 
-  getBrandFilter(brandName) {
-    return this.page.locator(
-      `[aria-label="Apply the filter ${brandName} to narrow results"]`
+  async checkFilterApplied(brand) {
+    const applied = this.page.locator(
+      selectors.filter.appliedBrand(brand)
     );
+    await expect(applied).toBeChecked();
   }
 
-  async applyBrandFilter(brandName) {
-    const filter = this.getBrandFilter(brandName);
+  // apply brand filter
+   async applyFilter(brand) {
+    const filter = this.page
+      .locator(selectors.filter.brand(brand))
+      .first();
 
-    await expect(filter.first()).toBeVisible();
-    await filter.first().click();
-
-    await this.page.waitForLoadState('domcontentloaded');
+    await expect(filter).toBeVisible();
+    await filter.click();
   }
 
-  async verifyBrandFilterApplied(brandName) {
-    await this.page.waitForTimeout(1000);
+  // get product info from search results
+  async getProductData(index) {
 
-    const appliedFilter = this.page.locator(
-      `[aria-label="Remove the filter ${brandName} to expand results"] input`
-    );
+    const products = this.page
+      .locator(selectors.product.results)
+      .filter({ hasNotText: 'Sponsored' });
 
-    await expect(appliedFilter).toBeChecked();
+    const count = await products.count();
+
+    if (index >= count) {
+      throw new Error(`Index ${index} > total products ${count}`);
+    }
+
+    const product = products.nth(index);
+
+    const name = await product
+      .locator(selectors.product.title)
+      .innerText();
+
+    const price = await product
+      .locator(selectors.product.price)
+      .first()
+      .innerText()
+      .catch(() => null);
+
+    const rating = await product
+      .locator(selectors.product.rating)
+      .first()
+      .innerText()
+      .catch(() => null);
+
+    console.log({ name, price, rating });
+
+    return { name, price, rating };
   }
+
+  // open product in same tab
+  async openProduct(index) {
+
+    const products = this.page
+      .locator(selectors.product.results)
+      .filter({ hasNotText: 'Sponsored' });
+
+    const count = await products.count();
+
+    if (index >= count) {
+      throw new Error(`Index ${index} > total products ${count}`);
+    }
+
+    const link = products
+      .nth(index)
+      .locator(selectors.product.link)
+      .first();
+
+    await expect(link).toBeVisible();
+
+    await link.scrollIntoViewIfNeeded();
+
+    // remove target to force same tab
+    await link.evaluate(node => node.removeAttribute('target'));
+
+    await Promise.all([
+      this.page.waitForLoadState('domcontentloaded'),
+      link.click()
+    ]);
+  }
+
 }
 
 export default SearchResultsPage;

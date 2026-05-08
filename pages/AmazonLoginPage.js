@@ -18,46 +18,48 @@ const selectors = {
 class AmazonLoginPage {
   constructor(page) {
     this.page = page;
-
-    this.emailInput = page.locator(selectors.input.email);
-    this.passwordInput = page.locator(selectors.input.password);
-
-    this.continueBtn = page.locator(selectors.button.continue);
-    this.signInBtn = page.locator(selectors.button.signIn);
-
-    this.emailDisplay = page.locator(selectors.text.emailDisplay);
-    this.greetingText = page.locator(selectors.text.greeting);
   }
 
-  async verifyLoginPage() {
-    await expect(this.page).toHaveTitle(/Amazon Sign-In/);
+  async verifyPageTitle(expectedTitle) {
+    await expect(this.page).toHaveTitle(expectedTitle);
   }
 
-  async enterEmail(email) {
-    await this.emailInput.clear();
-    await this.emailInput.pressSequentially(email, { delay: 100 });
+  // Works for both email and phone (+91 format)
+  async enterEmailOrPhone(emailphone) {
+    const input = this.page.locator(selectors.input.email);
+
+    //await input.clear();
+    await input.pressSequentially(emailphone, { delay: 100 });
   }
 
   async clickContinue() {
-    await this.continueBtn.click();
+    await this.page.locator(selectors.button.continue).click();
   }
 
   async enterPassword(password) {
-    await this.passwordInput.fill(password);
+    await this.page.locator(selectors.input.password).fill(password);
   }
 
   async clickSignin() {
-    await this.signInBtn.click();
+    await this.page.locator(selectors.button.signIn).click();
   }
 
-  async verifyEmailDisplayed(email) {
-    await expect(this.signInBtn).toBeVisible();
-    await expect(this.emailDisplay).toContainText(email);
+  // Exact match assertion (email OR phone)
+  async verifyEmailPhoneDisplayed(expectedValue) {
+    const emailText = this.page.locator(selectors.text.emailDisplay);
+
+    await expect(emailText).toBeVisible();
+    await expect(emailText).toHaveText(expectedValue);
   }
 
-  getUserGreeting() {
-    return this.greetingText;
+  // Login success validation using greeting
+  async verifyLoginSuccess() {
+    const greeting = this.page.locator(selectors.text.greeting);
+
+    await expect(greeting).toBeVisible();
+    await expect(greeting).toContainText('Hello');
   }
+
 }
 
 export default AmazonLoginPage;

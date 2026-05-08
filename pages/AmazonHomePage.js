@@ -3,92 +3,177 @@ import { expect } from '@playwright/test';
 const selectors = {
   button: {
     signIn: '#nav-link-accountList',
-    continueShopping: 'text=Continue shopping',
     allMenu: 'span.hm-icon-label',
     closeAllMenu: '#hmenu-close-icon',
-    searchBox: '#twotabsearchtextbox'
+    searchBox: '#twotabsearchtextbox',
+    continueShopping: 'button:has-text("Continue shopping")'
   },
+
   menu: {
     canvas: '#hmenu-canvas',
-    container: '#hmenu-canvas #hmenu-content'
+    container: '#hmenu-canvas #hmenu-content',
+    trendingSection: 'section[aria-labelledby="Trending"]',
+
+    // dynamic section locator
+    section: (name) => `section[aria-labelledby="${name}"]`
   }
 };
 
 class AmazonHomePage {
+
   constructor(page) {
     this.page = page;
-
-    this.signInBtn = page.locator(selectors.button.signIn);
-    this.allMenuBtn = page.locator(selectors.button.allMenu);
-    this.closeMenuBtn = page.locator(selectors.button.closeAllMenu);
-    this.searchBox = page.locator(selectors.button.searchBox);
-
-    this.menuCanvas = page.locator(selectors.menu.canvas);
-    this.menuContainer = page.locator(selectors.menu.container);
   }
 
-  async gotoURL(url) {
-  await this.page.goto(url, { waitUntil: 'domcontentloaded' });
-}
+  async gotoURL(path = '/') {
 
+    await this.page.goto(
+      path,
+      { waitUntil: 'domcontentloaded' }
+    );
+  }
+
+  // popup does not always appear
   async handleContinueShopping() {
-  const btn = this.page.getByRole('button', { name: 'Continue shopping' });
 
-  if (await btn.isVisible().catch(() => false)) {
-    await btn.click();
+    const btn = this.page.locator(
+      selectors.button.continueShopping
+    );
+
+    if (await btn.isVisible()) {
+      await btn.click();
+    }
   }
-}
 
   async clickSignIn() {
-    await this.signInBtn.click();
+
+    await this.page
+      .locator(selectors.button.signIn)
+      .click();
   }
 
   async clickAllMenu() {
-    await expect(this.allMenuBtn).toBeVisible();
 
-    for (let i = 0; i < 2; i++) {
-      await this.allMenuBtn.click();
+    await this.page.waitForTimeout(2000);
 
-      try {
-        await expect(this.menuCanvas.first()).toBeVisible({ timeout: 3000 });
-        return;
-      } catch {
-        await this.page.waitForTimeout(500);
-      }
-    }
+    await this.page.waitForLoadState(
+      'domcontentloaded'
+    );
 
-    throw new Error('Hamburger menu did not open');
+    await this.page
+      .locator(selectors.button.allMenu)
+      .click({ force: true });
   }
 
   async searchProduct(product) {
-    await this.searchBox.fill(product);
+
+    await this.page
+      .locator(selectors.button.searchBox)
+      .fill(product);
+
     await this.page.keyboard.press('Enter');
-    await this.page.waitForLoadState('domcontentloaded');
+
+    await this.page.waitForLoadState(
+      'domcontentloaded'
+    );
   }
 
-  async verifyMenuSection(sectionName) {
-    const section = this.menuContainer.locator(`section[aria-labelledby="${sectionName}"]`);
-    await expect(section.first()).toBeVisible({ timeout: 5000 });
+  // verify menu sections and items
+  async verifyMenuSections(menuData) {
+
+    const container = this.page.locator(
+      selectors.menu.container
+    );
+
+    for (const menu of menuData) {
+
+      const section = container.locator(
+        selectors.menu.section(menu.section)
+      );
+
+      await expect(
+        section.first()
+      ).toBeVisible();
+
+      for (const item of menu.items) {
+
+        await expect(
+          section.getByText(item).first()
+        ).toBeVisible();
+      }
+    }
   }
 
-  async verifyMenuItem(sectionName, itemName) {
-    const section = this.menuContainer.locator(`section[aria-labelledby="${sectionName}"]`);
-    await expect(section.getByText(itemName).first()).toBeVisible({ timeout: 5000 });
+  async closeAllMenu() {
+
+    await this.page.waitForTimeout(1000);
+
+    await this.page.keyboard.press('Escape');
+
+    await expect(
+      this.page
+        .locator(selectors.menu.container)
+        .locator(selectors.menu.trendingSection)
+        .first()
+    ).toBeHidden();
   }
 
- async closeAllMenu() {
-  const closeBtn = this.page.getByRole('button', { name: 'Close menu' }).first();
-  const menu = this.page.locator('#hmenu-canvas:visible');
+  async verifyMenuOpen() {
 
-  await expect(closeBtn).toBeVisible();
+    await this.page.waitForTimeout(1000);
 
-  await Promise.all([
-    menu.waitFor({ state: 'hidden' }),
-    closeBtn.click()
-  ]);
-}
-  getAllMenuContainer() {
-    return this.menuCanvas;
+    await expect(
+      this.page
+        .locator(selectors.menu.container)
+        .locator(selectors.menu.trendingSection)
+        .first()
+    ).toBeVisible();
+  }
+
+  //threshold
+  // =========================
+  // VISUAL TESTING METHODS
+  // =========================
+
+  // capture full page screenshot
+  async captureFullPageScreenshot(fileName) {
+
+    await this.page.screenshot({
+      path: `screenshots/${fileName}.png`,
+      fullPage: true
+    });
+  }
+
+  // capture specific element screenshot
+  async captureElementScreenshot(fileName) {
+
+    await this.page
+      .locator(selectors.menu.container)
+      .screenshot({
+        path: `screenshots/${fileName}.png`
+      });
+  }
+
+  // visual comparison for full page
+  async compareFullPageScreenshot(fileName) {
+
+    await expect(this.page)
+      .toHaveScreenshot(
+        `${fileName}.png`,
+        {
+          fullPage: true
+        }
+      );
+  }
+
+  // visual comparison for menu section only
+  async compareMenuScreenshot(fileName) {
+
+    await expect(
+      this.page.locator(selectors.menu.container)
+    ).toHaveScreenshot(
+      `${fileName}.png`
+    );
   }
 }
 
