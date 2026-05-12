@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
-import AmazonHomePage from '../pages/AmazonHomePage.js';
-import SearchResultsPage from '../pages/SearchResultsPage.js';
+import AmazonHomePage from '../../pages/AmazonHomePage.js';
+import SearchResultsPage from '../../pages/SearchResultsPage.js';
 
 /** @type {AmazonHomePage} */
 let home;
@@ -17,7 +17,7 @@ test.describe('Search Feature', () => {
     await home.handleContinueShopping();
   });
 
-  test('Search Product And Apply Brand Filter', async () => {
+  test('@smoke Search Product And Apply Brand Filter', async () => {
 
     // Search product
     await home.searchProduct('laptop');

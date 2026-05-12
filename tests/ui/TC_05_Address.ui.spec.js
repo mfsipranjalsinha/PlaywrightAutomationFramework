@@ -1,11 +1,11 @@
 import { test } from '@playwright/test';
+import AmazonHomePage from '../../pages/AmazonHomePage.js';
+import AmazonLoginPage from '../../pages/AmazonLoginPage.js';
+import AccountPage from '../../pages/AccountPage.js';
+import AddressPage from '../../pages/AddressPage.js';
+import { ENV } from '../../config/env.js';
 
-import AmazonHomePage from '../pages/AmazonHomePage.js';
-import AmazonLoginPage from '../pages/AmazonLoginPage.js';
-import AccountPage from '../pages/AccountPage.js';
-import AddressPage from '../pages/AddressPage.js';
-
-import addressData from '../test-data/addressData.json' assert { type: 'json' };
+import addressData from '../../test-data/addressData.json' assert { type: 'json' };
 
 let home;
 let login;
@@ -33,13 +33,13 @@ test.describe('Address Feature', () => {
     await home.clickSignIn();
 
     await login.enterEmailOrPhone(
-      process.env.EMAIL
+      ENV.amazon.email
     );
 
     await login.clickContinue();
 
     await login.enterPassword(
-      process.env.PASSWORD
+      ENV.amazon.password
     );
 
     await login.clickSignin();

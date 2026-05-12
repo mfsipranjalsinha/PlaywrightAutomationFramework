@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import AmazonHomePage from '../pages/AmazonHomePage.js';
+import AmazonHomePage from '../../pages/AmazonHomePage.js';
 
 /** @type {AmazonHomePage} */
 let home;

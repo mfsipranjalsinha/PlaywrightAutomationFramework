@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
 
-import AmazonHomePage from '../pages/AmazonHomePage.js';
-import SearchResultsPage from '../pages/SearchResultsPage.js';
-import ProductDetailsPage from '../pages/ProductDetailsPage.js';
-import CartPage from '../pages/CartPage.js';
+import AmazonHomePage from '../../pages/AmazonHomePage.js';
+import SearchResultsPage from '../../pages/SearchResultsPage.js';
+import ProductDetailsPage from '../../pages/ProductDetailsPage.js';
+import CartPage from '../../pages/CartPage.js';
 
 let home;
 let results;
@@ -27,7 +27,7 @@ test.describe('Cart Feature', () => {
     await home.handleContinueShopping();
   });
 
-  test(' @regression Dynamic Cart End To End Flow', async () => {
+  test('@regression Dynamic Cart End To End Flow', async () => {
 
     // Search first product
     await home.searchProduct('laptop');
@@ -69,6 +69,10 @@ test.describe('Cart Feature', () => {
 
     // Open cart
     await cart.openCart();
+
+    // Verify both products in cart
+    await cart.verifyProductPresent(product1);
+    await cart.verifyProductPresent(product2);
 
     // Verify cart has 2 items
     await cart.verifyCart(2);

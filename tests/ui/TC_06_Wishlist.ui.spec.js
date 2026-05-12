@@ -1,10 +1,11 @@
 import { test } from '@playwright/test';
 
-import AmazonHomePage from '../pages/AmazonHomePage.js';
-import AmazonLoginPage from '../pages/AmazonLoginPage.js';
-import SearchResultsPage from '../pages/SearchResultsPage.js';
-import ProductDetailsPage from '../pages/ProductDetailsPage.js';
-import WishlistPage from '../pages/WishlistPage.js';
+import AmazonHomePage from '../../pages/AmazonHomePage.js';
+import AmazonLoginPage from '../../pages/AmazonLoginPage.js';
+import SearchResultsPage from '../../pages/SearchResultsPage.js';
+import ProductDetailsPage from '../../pages/ProductDetailsPage.js';
+import WishlistPage from '../../pages/WishlistPage.js';
+import { ENV } from '../../config/env.js';
 
 let home;
 let login;
@@ -31,13 +32,13 @@ test.describe('Wishlist Feature', () => {
     await home.clickSignIn();
 
     await login.enterEmailOrPhone(
-      process.env.EMAIL
+      ENV.amazon.email
     );
 
     await login.clickContinue();
 
     await login.enterPassword(
-      process.env.PASSWORD
+      ENV.amazon.password
     );
 
     await login.clickSignin();

@@ -1,8 +1,14 @@
 // @ts-check
 
-import { defineConfig, devices } from '@playwright/test';
-
 import 'dotenv/config';
+
+import {
+  defineConfig,
+  devices
+} from '@playwright/test';
+
+import { ENV }
+  from './config/env.js';
 
 export default defineConfig({
 
@@ -10,19 +16,24 @@ export default defineConfig({
 
   fullyParallel: true,
 
-  forbidOnly: !!process.env.CI,
+  forbidOnly:
+    !!process.env.CI,
 
-  retries: process.env.CI ? 2 : 0,
+  retries:
+    process.env.CI ? 2 : 0,
 
-  workers: process.env.CI ? 1 : 1,
+  workers:
+    process.env.CI ? 1 : 1,
 
-  timeout: 60000,
+  timeout: 90000,
 
   reporter: [
 
     ['list'],
 
-    ['html', { open: 'never' }],
+    ['html', {
+      open: 'never'
+    }],
 
     ['allure-playwright']
 
@@ -30,9 +41,8 @@ export default defineConfig({
 
   use: {
 
-    headless: process.env.CI ? true : false,
-
-    baseURL: 'https://www.amazon.in',
+    headless:
+      process.env.CI ? true : false,
 
     viewport: {
       width: 1280,
@@ -43,11 +53,15 @@ export default defineConfig({
 
     navigationTimeout: 30000,
 
-    trace: 'on-first-retry',
+    trace:
+      'on-first-retry',
 
-    screenshot: 'only-on-failure',
+    screenshot:
+      'only-on-failure',
 
-    video: 'retain-on-failure',
+    video:
+      'retain-on-failure'
+
   },
 
   expect: {
@@ -56,19 +70,77 @@ export default defineConfig({
 
   projects: [
 
-    // {
-    //   name: 'chromium',
-    //   use: { ...devices['Desktop Chrome'] },
-    // },
+    {
+      name: 'chromium',
+
+      testIgnore: [
+        '**/*.api.spec.js'
+      ],
+
+      use: {
+
+        ...devices['Desktop Chrome'],
+
+        baseURL:
+          'https://www.amazon.in'
+
+      }
+    },
 
     // {
     //   name: 'firefox',
-    //   use: { ...devices['Desktop Firefox'] },
+
+    //   testIgnore: [
+    //     '**/*.api.spec.js'
+    //   ],
+
+    //   use: {
+
+    //     ...devices['Desktop Firefox'],
+
+    //     baseURL:
+    //       'https://www.amazon.in'
+
+    //   }
+    // },
+
+    // {
+    //   name: 'webkit',
+
+    //   testIgnore: [
+    //     '**/*.api.spec.js'
+    //   ],
+
+    //   use: {
+
+    //     ...devices['Desktop Safari'],
+
+    //     baseURL:
+    //       'https://www.amazon.in'
+
+    //   }
     // },
 
     {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
+      name: 'api',
+
+      testMatch: [
+        '**/*.api.spec.js'
+      ],
+
+      use: {
+
+        baseURL:
+          'https://reqres.in',
+
+        extraHTTPHeaders: {
+
+          'x-api-key':
+            ENV.reqres.apiKey
+
+        }
+
+      }
     }
 
   ]

@@ -5,9 +5,18 @@
   "main": "index.js",
 
   "scripts": {
-  "clean": "rimraf allure-results allure-report playwright-report test-results",
 
-  "test": "npm run clean && playwright test",
+  "clean":
+    "rimraf allure-results allure-report playwright-report test-results",
+
+  "test":
+    "npm run clean && playwright test",
+
+  "test:ui":
+    "npm run clean && playwright test --project=chromium",
+
+  "test:api":
+    "npm run clean && playwright test --project=api",
 
   "test:smoke":
     "npm run clean && playwright test --grep @smoke",
@@ -17,6 +26,12 @@
 
   "test:sanity":
     "npm run clean && playwright test --grep @sanity",
+
+  "test:e2e":
+    "npm run clean && playwright test --grep @e2e",
+
+  "test:ci":
+    "playwright test",
 
   "allure:generate":
     "allure generate allure-results --clean",

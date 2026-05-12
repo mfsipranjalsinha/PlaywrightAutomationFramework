@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import AmazonHomePage from '../pages/AmazonHomePage.js';
-import SearchResultsPage from '../pages/SearchResultsPage.js';
-import ProductDetailsPage from '../pages/ProductDetailsPage.js';
+import AmazonHomePage from '../../pages/AmazonHomePage.js';
+import SearchResultsPage from '../../pages/SearchResultsPage.js';
+import ProductDetailsPage from '../../pages/ProductDetailsPage.js';
 
 let home;
 let results;
@@ -18,7 +18,7 @@ test.describe('Product Details Feature', () => {
     await home.handleContinueShopping();
   });
 
-  test('Verify Product Details Data Consistency', async () => {
+  test('@smoke Verify Product Details Data Consistency', async () => {
 
     // Search product
     await home.searchProduct('headphones');

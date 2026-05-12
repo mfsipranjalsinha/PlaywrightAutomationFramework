@@ -65,7 +65,7 @@ class CartPage {
   }
 
   // Delete item using index
-  async deleteProduct(index = 0) {
+  async deleteProduct(index) {
 
     const deleteButtons = this.page.locator(
       selectors.button.delete
@@ -99,9 +99,7 @@ class CartPage {
     );
 
     const count = await titles.count();
-
     const items = [];
-
     for (let i = 0; i < count; i++) {
 
       const text = await titles
@@ -113,6 +111,35 @@ class CartPage {
 
     return items;
   }
+
+  // Verify specific product is present in cart
+  async verifyProductPresent(productData) {
+
+  const titles = await this.page
+    .locator(selectors.text.productTitle)
+    .allTextContents();
+
+  const prices = await this.page
+    .locator(selectors.text.productPrice)
+    .allTextContents();
+
+  const cleanedTitles = titles.map(t => t.trim());
+  const cleanedPrices = prices.map(p =>
+    p.replace(/[^\d.]/g, '').trim()
+  );
+
+  expect(
+    cleanedTitles.some(title =>
+      title.includes(productData.name.substring(0, 20))
+    )
+  ).toBeTruthy();
+
+  expect(
+    cleanedPrices.some(price =>
+      price.includes(productData.price.replace(/[^\d.]/g, ''))
+    )
+  ).toBeTruthy();
+}
 
   // Verify cart empty
   async verifyCartEmpty() {
