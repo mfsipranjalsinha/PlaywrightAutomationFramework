@@ -125,184 +125,284 @@ PlaywrightAutomationFramework/
 ├── package.json
 └── README.md
 
-## Prerequisites 
-Node.js 18 or later
-npm
+## Prerequisites
 
-Optional but recommended for local report generation:
+- Node.js 18 or later
+- npm
 
-Java 21 for Allure CLI
-GitHub account for CI/CD execution
-Setup
+Optional, but recommended for local report generation:
+
+- Java 21 for Allure CLI
+- GitHub account for CI/CD execution
+
+---
+
+## Setup
 
 Clone the repository:
 
+```bash
 git clone https://github.com/mfsipranjalsinha/PlaywrightAutomationFramework.git
 cd PlaywrightAutomationFramework
+```
 
 Install dependencies:
 
+```bash
 npm ci
+```
 
 Install Playwright browsers:
 
+```bash
 npx playwright install --with-deps
-Environment Variables
-Create a .env file in the project root:
+```
 
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
 EMAIL='your_email_here'
 PASSWORD='your_password_here'
 REQRES_API_KEY='your_reqres_api_key'
 MOCKAPI_BASE_URL='your_mockapi_base_url'
+```
 
-Purpose of each variable
-EMAIL and PASSWORD are used for Amazon login flows
-REQRES_API_KEY is used for ReqRes API requests
-MOCKAPI_BASE_URL is used for MockAPI CRUD validation
+### Purpose of each variable
 
-Running Tests
+- `EMAIL` and `PASSWORD` are used for Amazon login flows
+- `REQRES_API_KEY` is used for ReqRes API requests
+- `MOCKAPI_BASE_URL` is used for MockAPI CRUD validation
 
-Run the full framework
+---
+
+## Running Tests
+
+### Run the full framework
+
+```bash
 npm run test
+```
 
-Run UI tests only
+### Run UI tests only
+
+```bash
 npm run test:ui
+```
 
-Run API tests only
+### Run API tests only
+
+```bash
 npm run test:api
+```
 
-Run smoke tests
+### Run smoke tests
+
+```bash
 npm run test:smoke
+```
 
-Run regression tests
+### Run regression tests
+
+```bash
 npm run test:regression
+```
 
-Run sanity tests
+### Run sanity tests
+
+```bash
 npm run test:sanity
+```
 
-Run E2E-tagged tests
+### Run E2E-tagged tests
+
+```bash
 npm run test:e2e
+```
 
-Reporting
-HTML Report
+---
+
+## Reporting
+
+### HTML Report
 
 Playwright generates an HTML report automatically after execution.
 
 To open it locally:
 
+```bash
 npx playwright show-report
+```
 
-Allure Report
+### Allure Report
 
 Generate Allure results:
 
+```bash
 npm run allure:generate
+```
 
 Open the Allure report:
 
+```bash
 npm run allure:open
+```
 
 If needed, Allure can also be launched directly with:
 
+```bash
 npx allure open
+```
 
-##CI/CD
+---
+
+## Hosted Allure Report
+
+The latest Allure report is automatically deployed using GitHub Pages after a successful CI/CD run.
+
+Live report:
+
+https://mfsipranjalsinha.github.io/PlaywrightAutomationFramework/#
+
+The hosted report includes:
+
+- execution summary
+- passed and failed test details
+- screenshots on failure
+- traces and debugging artifacts
+- execution history
+- API and UI execution results
+
+This makes the latest execution easy to share with clients, recruiters, and reviewers without running the framework locally.
+
+---
+
+## CI/CD
 
 This repository includes a GitHub Actions workflow at:
 
+```text
 .github/workflows/playwright.yml
-CI workflow includes
-repository checkout
-Node.js setup
-Java setup for Allure
-dependency installation
-Playwright browser installation
-automated test execution
-Allure report generation
-artifact upload
-GitHub Pages deployment for report sharing
+```
+
+### CI workflow includes
+
+- repository checkout
+- Node.js setup
+- Java setup for Allure
+- dependency installation
+- Playwright browser installation
+- automated test execution
+- Allure report generation
+- artifact upload
+- GitHub Pages deployment for report sharing
 
 The badge at the top of this README reflects the workflow status.
 
-Test Design
-UI tests
+---
+
+## Test Design
+
+### UI tests
 
 UI tests follow the Page Object Model approach:
 
-keep locators inside page classes
-keep assertions in test files
-reuse methods across specs
-reduce duplication
-API tests
+- keep locators inside page classes
+- keep assertions in test files
+- reuse methods across specs
+- reduce duplication
+
+### API tests
 
 API tests are structured to cover:
 
-request creation
-response parsing
-response validation
-positive and negative cases
-CRUD flows
-reusable API client usage
-auth handling
-mocking and interception
-API Coverage Included
-ReqRes API
+- request creation
+- response parsing
+- response validation
+- positive and negative cases
+- CRUD flows
+- reusable API client usage
+- auth handling
+- mocking and interception
+
+---
+
+## API Coverage Included
+
+### ReqRes API
 
 Used for API fundamentals and response validation:
 
-GET users
-POST create user
-PUT update user
-PATCH partial update
-invalid login handling
-auth token reuse patterns
-MockAPI
+- GET users
+- POST create user
+- PUT update user
+- PATCH partial update
+- invalid login handling
+- auth token reuse patterns
+
+### MockAPI
 
 Used for real CRUD persistence validation:
 
-create user
-fetch created user
-update user
-delete user
-verify deletion
-Mocking and interception
+- create user
+- fetch created user
+- update user
+- delete user
+- verify deletion
+
+### Mocking and Interception
 
 A Playwright interception example is included using:
 
-page.route()
-route.fetch()
-route.fulfill()
+- `page.route()`
+- `route.fetch()`
+- `route.fulfill()`
 
 This demonstrates frontend testing with mocked backend responses.
 
-Adding New Tests
-UI test example
+---
+
+## Adding New Tests
+
+### UI test example
 
 Place new UI specs under:
 
+```text
 tests/ui/
-API test example
+```
+
+### API test example
 
 Place new API specs under:
 
+```text
 tests/api/
+```
 
 Use descriptive file names such as:
 
+```text
 TC_01_Search.ui.spec.js
 TC_02_CreateUser.api.spec.js
+```
 
 Keep each test focused on one business behavior.
 
-Contributing
+---
+
+## Contributing
 
 This repository is structured to stay clean and readable.
 
 When adding tests:
 
-keep page objects focused
-avoid repeating locators
-use reusable API utilities
-keep test data in JSON files
-use tags for grouping
-keep CI-safe execution in mind
+- keep page objects focused
+- avoid repeating locators
+- use reusable API utilities
+- keep test data in JSON files
+- use tags for grouping
+- keep CI-safe execution in mind
