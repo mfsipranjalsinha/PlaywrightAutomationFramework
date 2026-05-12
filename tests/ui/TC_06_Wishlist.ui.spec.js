@@ -109,7 +109,6 @@ test.describe('Wishlist Feature', () => {
     await wishlist.verifyListCreated(
       listName
     );
-
-  });
+});
 
 });
